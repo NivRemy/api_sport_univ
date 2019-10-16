@@ -29,11 +29,12 @@ class University {
 		}else {
 			$university = $request->fetch(PDO::FETCH_ASSOC);
 			//associe le résultat de la requête aux attribut de l'instance d'université
-			$this->_name =$university['university_name'];
-			$this->_street = $university['street'];
-			$this->_city = $university['city'];
-			$this->_zipcode = $university['zipcode'];
-			$this->_country = $university['country'];
+			$this->_name = utf8_encode($university['university_name']);
+			$this->_street = utf8_encode($university['street']);
+			$this->_city = utf8_encode($university['city']);
+			$this->_zipcode = utf8_encode($university['zipcode']);
+			$this->_country = utf8_encode($university['country']);
+			return true;
 		}
 		
 
