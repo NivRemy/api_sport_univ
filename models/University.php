@@ -14,6 +14,25 @@ class University {
 		$this->_conn = $bdd->connect();
 	}
 
+	public function get(){
+		$request = $this->_conn->query('SELECT * FROM universities JOIN addresses ON addresses.id = universities.id_address');
+
+		if($request->rowCount() <=0){
+			return false;
+		}else{
+			while($university = $request->fetch(PDO::FETCH_ASSOC)){
+				$this->_id = $university['id'];
+				$this->_name = utf8_encode($university['university_name']);
+				$this->_street = utf8_encode($university['street']);
+				$this->_city = utf8_encode($university['city']);
+				$this->_zipcode = utf8_encode($university['zipcode']);
+				$this->_country = utf8_encode($university['country']);
+				yield $this;
+			}
+		}
+
+	}
+
 	public function getOne(){
 		//Requête qui récupère toutes les informations d'une université
 		$request = $this->_conn->prepare('SELECT * FROM universities JOIN addresses ON addresses.id = universities.id_address WHERE universities.id = :id LIMIT 1');
@@ -36,11 +55,5 @@ class University {
 			$this->_country = utf8_encode($university['country']);
 			return true;
 		}
-		
-
-	
-
 	}
-
-
 }

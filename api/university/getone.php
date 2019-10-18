@@ -10,14 +10,16 @@ $bdd = new Database();
 //Instanciation d'une université (avec un accès à une bdd)
 $university = new University($bdd);
 
-//Définir l'id de l'université.
 
 
-//Récupérer les informations de l'université.
+
+
 
 
 if(isset($_GET['id'])){
+	//Définir l'id de l'université.
 	$university->_id = $_GET['id'];
+	//Récupérer les informations de l'université.
 	if($university->getOne()){
 
 
