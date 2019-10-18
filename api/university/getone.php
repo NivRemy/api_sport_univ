@@ -1,4 +1,5 @@
 <?php
+//Indiquer que l'on envoie des informations au format JSON
 header('Content-Type: application/json');
 require '../../config/Database.php';
 require '../../models/University.php';
