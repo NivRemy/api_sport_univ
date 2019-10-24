@@ -21,6 +21,41 @@ class User{
 		$this->_conn = $bdd->connect();
 	}
 
+
+	public function get(){
+		$sql = ' SELECT * FROM users as u
+		 JOIN user_types as ut ON u.id_user_type = ut.id
+		 JOIN addresses as a ON u.id_address = a.id ';
+
+		//query fait office à la fois de prepare et de execute
+		$request = $this->_conn->query($sql);
+
+
+		if($request->rowCount() ==0){
+			return false;
+		}else{
+			while($user= $request->fetch(PDO::FETCH_ASSOC)){
+
+				$this->_user_type = utf8_encode($user['user_type']);
+				$this->_name = utf8_encode($user['user_name']);
+				$this->_last_name = utf8_encode($user['user_lastname']);
+				$this->_phone = utf8_encode($user['user_phone']);
+				$this->_email = utf8_encode($user['user_email']);
+				$this->_login = utf8_encode($user['user_id_connection']);
+				$this->_street = utf8_encode($user['street']);
+				$this->_city = utf8_encode($user['city']);
+				$this->_zipcode = utf8_encode($user['zipcode']);
+				$this->_country = utf8_encode($user['country']);
+
+				//instance de l'objet ($this)
+				yield $this;
+
+			}
+		}
+
+	}
+
+
 	//Créer la méthode getOne()
 	public function getOne(){
 		//Requête pour récupérer un utilisateur (avec les informations des tables associées)
