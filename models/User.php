@@ -8,6 +8,7 @@ class User{
 	public $_phone;
 	public $_email;
 	public $_login;
+	public $_password;
 	public $_street;
 	public $_city;
 	public $_zipcode;
@@ -24,8 +25,8 @@ class User{
 
 	public function get(){
 		$sql = ' SELECT * FROM users as u
-		 JOIN user_types as ut ON u.id_user_type = ut.id
-		 JOIN addresses as a ON u.id_address = a.id ';
+		JOIN user_types as ut ON u.id_user_type = ut.id
+		JOIN addresses as a ON u.id_address = a.id ';
 
 		//query fait office à la fois de prepare et de execute
 		$request = $this->_conn->query($sql);
@@ -61,19 +62,19 @@ class User{
 		//Requête pour récupérer un utilisateur (avec les informations des tables associées)
 		$sql = 
 		'SELECT * FROM users as u
-		 JOIN user_types as ut ON u.id_user_type = ut.id
-		 JOIN addresses as a ON u.id_address = a.id
-		 WHERE u.id = :id';
+		JOIN user_types as ut ON u.id_user_type = ut.id
+		JOIN addresses as a ON u.id_address = a.id
+		WHERE u.id = :id';
 
-		 $request = $this->_conn->prepare($sql);
+		$request = $this->_conn->prepare($sql);
 
-		 $request->bindParam(':id',$this->_id);
+		$request->bindParam(':id',$this->_id);
 
-		 $request->execute();
+		$request->execute();
 
 
 		//On compte le nombre de résultat de la requête, et si il y en a au moins 1, on stock les valeurs.
-		 if($request->rowCount() ==0){
+		if($request->rowCount() ==0){
 			return false;
 		}else{
 			$user = $request->fetch(PDO::FETCH_ASSOC);
@@ -93,4 +94,31 @@ class User{
 
 	}
 
+	public function create(){
+		$sql= 'INSERT INTO addresses VALUES(NULL, :street, :zipcode, :city, :country)';
+		$request=$this->_conn->prepare($sql);
+		$request->bindValue(':street', htmlentities($this->_street));
+		$request->bindValue(':zipcode', htmlentities($this->_zipcode));
+		$request->bindValue(':city', htmlentities($this->_city));
+		$request->bindValue(':country', htmlentities($this->_country));
+		$request->execute();
+
+		$sql = 'INSERT INTO users VALUES (NULL, 1, LAST_INSERT_ID(), :user_name, :user_lastname, :user_phone, :user_email, :user_id_connection, :user_password, NULL)';
+		$request=$this->_conn->prepare($sql);
+		$request->bindValue(':user_name', htmlentities($this->_name));
+		$request->bindValue(':user_lastname', htmlentities($this->_last_name));
+		$request->bindValue(':user_phone', htmlentities($this->_phone));
+		$request->bindValue(':user_email', htmlentities($this->_email));
+		$request->bindValue(':user_id_connection', htmlentities($this->_login));
+		$request->bindValue(':user_password', password_hash($this->_password,PASSWORD_DEFAULT));
+
+		if($request->execute()){
+			return true;
+		}
+    	// Ecrire l'erreur si il y en a une
+		printf('Erreur:' . $request->error . '. \n');
+		return false;
+
+
+	}
 }
