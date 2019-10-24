@@ -56,4 +56,34 @@ class University {
 			return true;
 		}
 	}
+
+	public function create(){
+		//d'abord on insert l'adresse
+		$sql = 'INSERT INTO addresses VALUES (NULL,:street,:zipcode,:city,:country)';
+
+		$request = $this->_conn->prepare($sql);
+
+		//Je remplace les variables par les éléments de la requête
+		$request->bindValue(':street',htmlentities($this->_street));
+		$request->bindValue(':zipcode',htmlentities($this->_zipcode));
+		$request->bindValue(':city',htmlentities($this->_city));
+		$request->bindValue(':country',htmlentities($this->_country));
+
+		//J'insert mon adresse
+		$request->execute();
+
+		//Deuxième requête sql, la variable sql n'est plus utile, donc je peux la réutiliser.
+		$sql = 'INSERT INTO universities VALUES (NULL,LAST_INSERT_ID(),:university_name)';
+
+		$request = $this->_conn->prepare($sql);
+
+		$request->bindValue(':university_name',htmlentities($this->_name));
+		//J'insère mon université.
+		if($request->execute()){
+        	return true;
+    	}
+    	// Ecrire l'erreur si il y en a une
+    	printf('Erreur:' . $request->error . '. \n');
+    	return false;
+	}
 }
